@@ -89,13 +89,12 @@ impl ObjectImpl for Foo {
     fn properties() -> &'static [glib::ParamSpec] {
         use once_cell::sync::Lazy;
         static PROPERTIES: Lazy<Vec<glib::ParamSpec>> = Lazy::new(|| {
-            vec![glib::ParamSpecString::new(
-                "name",
-                "Name",
-                "Name of this object",
-                None,
-                glib::ParamFlags::READWRITE,
-            )]
+            vec![glib::ParamSpecString::builder("name")
+                .nick("Name")
+                .blurb("Name of this object")
+                .default_value(None)
+                .flags(glib::ParamFlags::READWRITE)
+                .build()]
         });
 
         PROPERTIES.as_ref()
@@ -204,7 +203,9 @@ pub(crate) mod ffi {
     /// Must be a valid C string, 0-terminated.
     #[no_mangle]
     pub unsafe extern "C" fn ex_foo_new(name: *const c_char) -> *mut ExFoo {
-        glib::Object::new::<super::super::Foo>(&[("name", &*glib::GString::from_glib_borrow(name))])
+        glib::Object::builder::<super::super::Foo>()
+            .property("name", &*glib::GString::from_glib_borrow(name))
+            .build()
             .to_glib_full()
     }
 

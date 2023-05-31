@@ -27,15 +27,14 @@ impl ObjectImpl for Bar {
     fn properties() -> &'static [glib::ParamSpec] {
         use once_cell::sync::Lazy;
         static PROPERTIES: Lazy<Vec<glib::ParamSpec>> = Lazy::new(|| {
-            vec![glib::ParamSpecDouble::new(
-                "number",
-                "Number",
-                "Some number",
-                0.0,
-                100.0,
-                0.0,
-                glib::ParamFlags::READWRITE,
-            )]
+            vec![glib::ParamSpecDouble::builder("number")
+                .nick("Number")
+                .blurb("Some number")
+                .minimum(0.0)
+                .maximum(100.0)
+                .default_value(0.0)
+                .flags(glib::ParamFlags::READWRITE)
+                .build()]
         });
 
         PROPERTIES.as_ref()
@@ -107,11 +106,10 @@ pub(crate) mod ffi {
     /// Must be a valid C string, 0-terminated.
     #[no_mangle]
     pub unsafe extern "C" fn ex_bar_new(name: *const c_char) -> *mut ExBar {
-        let obj = glib::Object::new::<super::super::Bar>(&[(
-            "name",
-            &*glib::GString::from_glib_borrow(name),
-        )]);
-        obj.to_glib_full()
+        glib::Object::builder::<super::super::Bar>()
+            .property("name", &*glib::GString::from_glib_borrow(name))
+            .build()
+            .to_glib_full()
     }
 
     #[no_mangle]

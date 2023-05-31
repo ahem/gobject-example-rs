@@ -48,7 +48,7 @@ mod tests {
         let t = Flags::static_type();
         assert!(t.is_a(glib::Type::FLAGS));
         assert_eq!(t.name(), "ExFlags");
-        let e = glib::FlagsClass::new(t).unwrap();
+        let e = glib::FlagsClass::with_type(t).unwrap();
         let v = e.value(1).unwrap();
         assert_eq!(v.name(), "Some");
         assert_eq!(v.nick(), "some");
